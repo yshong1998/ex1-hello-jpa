@@ -14,12 +14,28 @@ public class JpaMain {
         EntityTransaction tx = em.getTransaction();
         tx.begin();
         try {
-            Member member = em.find(Member.class, 150L);
-            member.setName("ZZZZZ");
+            Member member1 = new Member();
+            member1.setUsername("A");
 
-//            JPA의 변경 감지라는 기능 덕분에 아래를 하지 않아도 됨 트랜잭션이 끝나면 변경을 감지해서 자동 커밋
-//            em.persist(member);
-            System.out.println("-=============");
+            Member member2 = new Member();
+            member2.setUsername("B");
+
+            Member member3 = new Member();
+            member3.setUsername("C");
+
+            System.out.println("======================");
+
+            //DB SEQ = 1   |   1
+            //DB SEQ = 51  |   2
+            //DB SEQ = 51  |   3
+
+            em.persist(member1); //1 -> 1이면 다음 시퀀스가 필요한 상태니까 한 번 더 호출 -> 51로 한 번 더 증가
+            em.persist(member2); //MEM DB의 시퀀스 값은 그대로 51이고 메모리에서는 증가
+            em.persist(member3); //MEM
+            System.out.println("member1 = " + member1.getId());
+            System.out.println("member2 = " + member2.getId());
+            System.out.println("member3 = " + member3.getId());
+            System.out.println("======================");
 
             tx.commit();
         } catch (Exception e) {
